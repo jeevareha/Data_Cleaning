@@ -20,8 +20,6 @@ parse_date('%B %d, %Y', SaleDate) AS SaleDate_New
 FROM `data-cleaning-project-427815.nashville_housing_data.hashville_housing_data`
 )
 
--- 
-
 ,NULL_ADDRESS AS (
  SELECT distinct  A.*, IFNULL(A.PropertyAddress,B.PropertyAddress) AS Updated_Address
  FROM DATE_CONVERT AS A
@@ -81,39 +79,68 @@ SELECT * FROM EXCLUDE_UNUSED_COLUMNS
 ```
 
 
-Standardize Date Format
-In BigQuery, you can convert the date "April 9, 2013" into a date format using the `PARSE_DATE` function. Here's how you can do it:
+### Standardize Date Format
 
-```sql
-SELECT PARSE_DATE('%B %d, %Y', 'April 9, 2013') AS date_value
-```
+#### CTE - DATE_CONVERT
 
-Explanation:
-- `PARSE_DATE('%B %d, %Y', 'April 9, 2013')`: This function takes two parameters:
-  - The first parameter `'%B %d, %Y'` specifies the format of the date string you want to parse. Here:
-    - `%B` stands for the full month name (April),
-    - `%d` stands for the day of the month (9),
-    - `%Y` stands for the four-digit year (2013).
-  - The second parameter is the actual date string `'April 9, 2013'` that you want to convert.
+This query transforms the SaleDate field from a specific format ('%B %d, %Y') into a standardized date format (SaleDate_New) for analysis. It reads data from the hashville_housing_data table within the nashville_housing_data dataset in data-cleaning-project-427815. This transformation ensures consistency and usability of SaleDate data by parsing it into a structured date format (Month Day, Year).
 
-This query will return the date value in a format that BigQuery recognizes as a date type, allowing you to use it in further SQL operations or comparisons as needed.
+ <img width="1084" alt="Screenshot 2024-07-07 at 4 07 29 PM" src="https://github.com/jeevareha/Data_Cleaning/assets/32441508/bb3ea2df-00a9-4e9f-b1cb-6ad21a4f941c">
 
+### Populate Address
 
+#### CTE - NULL_ADDRESS
 
-Populate Address
+This query generates unique rows (DISTINCT A.*) from the DATE_CONVERT dataset (A) while ensuring each row's PropertyAddress is filled (IFNULL(A.PropertyAddress, B.PropertyAddress)). It achieves this by left joining DATE_CONVERT with itself (B) on matching ParcelID values, excluding rows where A.UniqueID_ matches B.UniqueID_. This comparison ensures each row is distinct while ensuring PropertyAddress is filled where possible from other rows sharing the same ParcelID.
 
+<img width="1081" alt="Screenshot 2024-07-07 at 4 22 08 PM" src="https://github.com/jeevareha/Data_Cleaning/assets/32441508/8e409f76-38b7-474f-a262-c374896d705e">
 
+### Breaking out address field into Address, City, State
 
-Breaking out address field into Address, City, State
+#### CTE - PROPERTY_ADDRESS_SPLIT
 
+This query splits the PropertyAddress field into its components (PROPERTY_ADDR and PROPERTY_CITY) using the SPLIT function. It extracts the second last part (PROPERTY_ADDR) and the last part (PROPERTY_CITY) of the address after splitting by commas. This transformation is performed on the dataset NULL_ADDRESS, aiming to parse and categorize address details such as street names (PROPERTY_ADDR) and cities (PROPERTY_CITY) for further analysis or categorization.
 
-Changing Y and N into TRUE and FALSE for “Sold as vacant” field
+<img width="1078" alt="Screenshot 2024-07-07 at 4 25 38 PM" src="https://github.com/jeevareha/Data_Cleaning/assets/32441508/8a69b77a-a4b5-4896-ab82-f9359be9312e">
 
 
+#### CTE - OWNER_ADDRESS_SPLIT
+This query splits the OwnerAddress field into its components (OWNER_ADDR, OWNER_CITY, OWNER_STATE) using the SPLIT function. It extracts specific parts of the address after splitting by commas: the third last part (OWNER_ADDR), the second last part (OWNER_CITY), and the last part (OWNER_STATE). This transformation is applied on the dataset PROPERTY_ADDRESS_SPLIT, aiming to parse and categorize owner address details such as street addresses, cities, and states for further analysis or processing.
+
+<img width="1046" alt="Screenshot 2024-07-07 at 4 33 02 PM" src="https://github.com/jeevareha/Data_Cleaning/assets/32441508/fb19c66f-6433-482d-ab8b-cbeda79a7b8b">
+
+### Changing TRUE and FALSE into Y and N for “Sold as vacant” field
+
+#### CTE - CHANGE_SOLD_AS_VACANT
+This query adds a new column SoldAsVacantUpdated to the dataset OWNER_ADDRESS_SPLIT, categorizing each row based on the SoldAsVacant field. Rows where SoldAsVacant is false are marked as 'N', and rows where SoldAsVacant is true are marked as 'Y'. This transformation simplifies the representation of vacant property sales status for analysis or reporting purposes.
+
+<img width="1068" alt="Screenshot 2024-07-07 at 4 39 10 PM" src="https://github.com/jeevareha/Data_Cleaning/assets/32441508/0e863846-eccf-48a7-9c71-492261bfd9d1">
 
 
-Remove Duplicates
+### Remove Duplicates
 
+#### CTE - REMOVE_DUPLICATES, REMOVE_DUPLICATES_FINAL
 
-Delete unused columns
+This SQL sequence removes duplicate records based on specified criteria:
+
+REMOVE_DUPLICATES CTE:
+
+Assigns a row number (rn) to each record within partitions defined by ParcelId, PropertyAddress, SalePrice, SaleDate, and LegalReference, ordered by UniqueID_.
+Ensures each combination of these fields is uniquely identified by rn.
+
+REMOVE_DUPLICATES_FINAL CTE:
+
+Filters the results from REMOVE_DUPLICATES to retain only rows where rn equals 1.
+Ensures that only the first occurrence of each unique combination defined by the partitioning criteria remains in the final dataset.
+These steps ensure data integrity by eliminating duplicate entries based on specified key fields, providing a clean dataset for further analysis or processing.
+
+<img width="1082" alt="Screenshot 2024-07-07 at 4 46 13 PM" src="https://github.com/jeevareha/Data_Cleaning/assets/32441508/a33b3e0b-f3ca-4f22-be83-98a8c309020b">
+
+### Delete unused columns
+
+#### CTE - EXCLUDE_UNUSED_COLUMNS
+This query selects all columns from the REMOVE_DUPLICATES_FINAL dataset but excludes specific columns (PropertyAddress, SaleDate, SoldAsVacant, OwnerAddress, Updated_Address). It aims to focus on other attributes while omitting these specific fields, likely for a more streamlined view or analysis of the cleaned dataset after handling duplicates and irrelevant columns.
+
+<img width="1088" alt="Screenshot 2024-07-07 at 5 02 48 PM" src="https://github.com/jeevareha/Data_Cleaning/assets/32441508/db69f07c-036c-454c-b7d2-6ee9c5eea57f">
+
 
