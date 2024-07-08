@@ -2,6 +2,53 @@
 
 Data cleaning is the process of detecting and correcting errors or inconsistencies in a dataset to ensure accuracy, completeness, and reliability for analysis. 
 
+Dataset Summary
+The dataset appears to be related to housing data in Nashville, containing details about various properties. Each row represents a single property, and the dataset includes a variety of attributes related to the properties.
+
+### Columns and Descriptions
+
+
+**UniqueID**: A unique identifier for each property.
+
+**ParcelID**: The parcel identification number.
+
+**LandUse**: The type of land use (e.g., "SINGLE FAMILY").
+
+**PropertyAddress**: The address of the property.
+
+**SaleDate**: The date the property was sold.
+
+**SalePrice**: The sale price of the property.
+
+**LegalReference**: The legal reference associated with the sale.
+
+**SoldAsVacant**: Indicates if the property was sold as vacant ("Yes" or "No").
+
+**OwnerName**: The name of the property owner.
+
+**OwnerAddress**: The address of the property owner.
+
+**Acreage**: The size of the property in acres.
+
+**TaxDistrict**: The tax district in which the property is located.
+
+**LandValue**: The assessed land value of the property.
+
+**BuildingValue**: The assessed building value of the property.
+
+**TotalValue**: The total assessed value of the property.
+
+**YearBuilt**: The year the property was built.
+
+**Bedrooms**: The number of bedrooms in the property.
+
+**FullBath**: The number of full bathrooms in the property.
+
+**HalfBath**: The number of half bathrooms in the property.
+
+
+
+
 ```
 
 SELECT * FROM `data-cleaning-project-427815.nashville_housing_data.hashville_housing_data`
