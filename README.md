@@ -4,7 +4,7 @@ Data cleaning is the process of detecting and correcting errors or inconsistenci
 
 **Dataset Summary**
 
-The dataset appears to be related to housing data in Nashville, containing details about various properties. Each row represents a single property, and the dataset includes a variety of attributes related to the properties.
+The dataset is related to housing data in Nashville, containing details about various properties. Each row represents a single property, and the dataset includes a variety of attributes related to the properties.
 
 ### Columns and Descriptions
 
