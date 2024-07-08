@@ -48,13 +48,8 @@ The dataset is related to housing data in Nashville, containing details about va
 **HalfBath**: The number of half bathrooms in the property.
 
 
+-------------------------------------------------------------------------------------------------------------------------
 
-
-```
-
-SELECT * FROM `data-cleaning-project-427815.nashville_housing_data.hashville_housing_data`
-
-```
 
 ###### Using CTE - Common Table Expression
 
@@ -126,6 +121,7 @@ SELECT * FROM EXCLUDE_UNUSED_COLUMNS
 
 ```
 
+-------------------------------------------------------------------------------------------------------------------------
 
 ### Standardize Date Format
 
@@ -135,6 +131,8 @@ This query transforms the SaleDate field from a specific format ('%B %d, %Y') in
 
  <img width="1084" alt="Screenshot 2024-07-07 at 4 07 29 PM" src="https://github.com/jeevareha/Data_Cleaning/assets/32441508/bb3ea2df-00a9-4e9f-b1cb-6ad21a4f941c">
 
+-------------------------------------------------------------------------------------------------------------------------
+
 ### Populate Address
 
 #### CTE - NULL_ADDRESS
@@ -142,6 +140,8 @@ This query transforms the SaleDate field from a specific format ('%B %d, %Y') in
 This query generates unique rows (DISTINCT A.*) from the DATE_CONVERT dataset (A) while ensuring each row's PropertyAddress is filled (IFNULL(A.PropertyAddress, B.PropertyAddress)). It achieves this by left joining DATE_CONVERT with itself (B) on matching ParcelID values, excluding rows where A.UniqueID_ matches B.UniqueID_. This comparison ensures each row is distinct while ensuring PropertyAddress is filled where possible from other rows sharing the same ParcelID.
 
 <img width="1081" alt="Screenshot 2024-07-07 at 4 22 08 PM" src="https://github.com/jeevareha/Data_Cleaning/assets/32441508/8e409f76-38b7-474f-a262-c374896d705e">
+
+-------------------------------------------------------------------------------------------------------------------------
 
 ### Breaking out address field into Address, City, State
 
@@ -151,6 +151,7 @@ This query splits the PropertyAddress field into its components (PROPERTY_ADDR a
 
 <img width="1078" alt="Screenshot 2024-07-07 at 4 25 38 PM" src="https://github.com/jeevareha/Data_Cleaning/assets/32441508/8a69b77a-a4b5-4896-ab82-f9359be9312e">
 
+-------------------------------------------------------------------------------------------------------------------------
 
 #### CTE - OWNER_ADDRESS_SPLIT
 This query splits the OwnerAddress field into its components (OWNER_ADDR, OWNER_CITY, OWNER_STATE) using the SPLIT function. It extracts specific parts of the address after splitting by commas: the third last part (OWNER_ADDR), the second last part (OWNER_CITY), and the last part (OWNER_STATE). This transformation is applied on the dataset PROPERTY_ADDRESS_SPLIT, aiming to parse and categorize owner address details such as street addresses, cities, and states for further analysis or processing.
@@ -159,11 +160,14 @@ This query splits the OwnerAddress field into its components (OWNER_ADDR, OWNER_
 
 ### Changing TRUE and FALSE into Y and N for “Sold as vacant” field
 
+-------------------------------------------------------------------------------------------------------------------------
+
 #### CTE - CHANGE_SOLD_AS_VACANT
 This query adds a new column SoldAsVacantUpdated to the dataset OWNER_ADDRESS_SPLIT, categorizing each row based on the SoldAsVacant field. Rows where SoldAsVacant is false are marked as 'N', and rows where SoldAsVacant is true are marked as 'Y'. This transformation simplifies the representation of vacant property sales status for analysis or reporting purposes.
 
 <img width="1068" alt="Screenshot 2024-07-07 at 4 39 10 PM" src="https://github.com/jeevareha/Data_Cleaning/assets/32441508/0e863846-eccf-48a7-9c71-492261bfd9d1">
 
+-------------------------------------------------------------------------------------------------------------------------
 
 ### Remove Duplicates
 
@@ -183,6 +187,8 @@ Ensures that only the first occurrence of each unique combination defined by the
 These steps ensure data integrity by eliminating duplicate entries based on specified key fields, providing a clean dataset for further analysis or processing.
 
 <img width="1082" alt="Screenshot 2024-07-07 at 4 46 13 PM" src="https://github.com/jeevareha/Data_Cleaning/assets/32441508/a33b3e0b-f3ca-4f22-be83-98a8c309020b">
+
+-------------------------------------------------------------------------------------------------------------------------
 
 ### Delete unused columns
 
